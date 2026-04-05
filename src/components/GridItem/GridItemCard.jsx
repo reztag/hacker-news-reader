@@ -14,11 +14,12 @@ import {
   Footer,
   CommentLink,
   CommentCount,
+  CommentIcon,
 } from './styles';
 
 const FALLBACK_THUMBNAIL = 'https://miro.medium.com/max/1176/1*F9RzuXseG1VrTjFJd403gw.png';
 
-const GridItem = ({ url, title, id, kids = [], descendants }) => {
+const GridItemCard = ({ url, title, id, kids = [], descendants }) => {
   const site = getSiteHostname(url) || 'news.ycombinator.com';
   const link = getArticleLink({ url, id });
   const commentUrl = `${HN_ITEM}${id}`;
@@ -64,7 +65,16 @@ const GridItem = ({ url, title, id, kids = [], descendants }) => {
                 title="Open Hacker News comments"
                 onClick={event => event.stopPropagation()}
               >
-                <span aria-hidden="true">💬</span>
+                <CommentIcon viewBox="0 0 24 24" aria-hidden="true">
+                  <path
+                    d="M6 7.5h12M6 12h9m-9 4.5h6M5.5 4.5h13a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-7l-4 3v-3h-2a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2Z"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.8"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </CommentIcon>
                 <CommentCount>{commentCount}</CommentCount>
               </CommentLink>
             </Footer>
@@ -75,7 +85,7 @@ const GridItem = ({ url, title, id, kids = [], descendants }) => {
   );
 };
 
-GridItem.propTypes = {
+GridItemCard.propTypes = {
   url: PropTypes.string,
   title: PropTypes.string.isRequired,
   id: PropTypes.number.isRequired,
@@ -83,4 +93,4 @@ GridItem.propTypes = {
   descendants: PropTypes.number,
 };
 
-export default GridItem;
+export default GridItemCard;

@@ -33,10 +33,15 @@ export const NavSection = styled.div`
   align-items: center;
 `;
 
-export const Icon = styled.div`
+export const Icon = styled.button`
   margin-left: 12px;
-  font-size: 18px;
+  font-size: 20px;
+  line-height: 1;
   cursor: pointer;
+  color: ${({ theme }) => theme.text};
+  background: transparent;
+  border: 0;
+  padding: 0;
 `;
 
 export const Logo = styled.img`

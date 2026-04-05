@@ -39,10 +39,8 @@ export const LinkWrapper = styled.div`
 
 export const SocialLink = styled.a`
   margin-left: 16px;
-
-  i {
-    color: ${({ theme }) => theme.text};
-  }
+  color: ${({ theme }) => theme.text};
+  font-size: 14px;
 
   ${mobile} {
     margin-left: 0;

@@ -72,19 +72,19 @@ const App = () => {
             </Title>
             <div>
               <SocialLink href="https://twitter.com/gitconnected" target="_blank">
-                <i className="fab fa-twitter" />
+                Twitter
               </SocialLink>
               <SocialLink href="https://community.gitconnected.com" target="_blank">
-                <i className="fab fa-slack-hash" />
+                Slack
               </SocialLink>
               <SocialLink href="https://levelup.gitconnected.com" target="_blank">
-                <i className="fab fa-medium-m" />
+                Medium
               </SocialLink>
               <SocialLink href="https://www.facebook.com/gitconnectednetwork" target="_blank">
-                <i className="fab fa-facebook" />
+                Facebook
               </SocialLink>
               <SocialLink href="https://gitconnected.com" target="_blank">
-                <i className="fas fa-link" />
+                Site
               </SocialLink>
             </div>
           </TitleWrapper>

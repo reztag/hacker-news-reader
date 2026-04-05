@@ -7,6 +7,7 @@ const rootPath = path.dirname(fileURLToPath(import.meta.url));
 const srcPath = path.resolve(rootPath, 'src');
 
 export default defineConfig({
+  base: './',
   plugins: [
     react({
       include: /\.(js|jsx)$/,

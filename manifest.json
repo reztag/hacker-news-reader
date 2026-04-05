@@ -1,0 +1,28 @@
+{
+  "manifest_version": 3,
+  "name": "Hacker News Reader",
+  "description": "Read top Hacker News stories in a Chrome extension.",
+  "version": "0.1.0",
+  "chrome_url_overrides": {
+    "newtab": "dist/index.html"
+  },
+  "action": {
+    "default_title": "Hacker News Reader"
+  },
+  "background": {
+    "service_worker": "extension-background.js"
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'; img-src 'self' data: https:; connect-src 'self' https:;"
+  },
+  "icons": {
+    "16": "public/favicon.ico",
+    "32": "public/favicon.ico",
+    "48": "public/favicon.ico",
+    "128": "public/favicon.ico"
+  },
+  "host_permissions": [
+    "<all_urls>",
+    "https://hacker-news.firebaseio.com/*"
+  ]
+}

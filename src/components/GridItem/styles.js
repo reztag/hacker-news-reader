@@ -41,14 +41,42 @@ export const Title = styled.h3`
   color: ${({ theme }) => theme.text};
   margin: 0;
   padding: 16px;
-  padding-bottom: 70px;
   font-size: 16px;
   font-weight: 400;
   flex-grow: 1;
 `;
 
-export const Source = styled.div`
+export const Footer = styled.div`
   color: ${({ theme }) => theme.textSecondary};
   border-top: 1px solid ${({ theme }) => theme.border};
   padding: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+`;
+
+export const Source = styled.div`
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 16px;
+`;
+
+export const CommentLink = styled.a`
+  color: ${({ theme }) => theme.textSecondary};
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+`;
+
+export const CommentCount = styled.span`
+  font-size: 16px;
+`;
+
+export const CommentIcon = styled.svg`
+  width: 18px;
+  height: 18px;
 `;

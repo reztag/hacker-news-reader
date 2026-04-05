@@ -15,21 +15,21 @@ const Nav = ({ layout, theme, setLayout, setTheme }) => (
         </NavSection>
         <NavSection>
           {layout === layouts.list ? (
-            <Icon onClick={() => setLayout(layouts.grid)}>
-              <i className="fas fa-th-large" />
+            <Icon type="button" aria-label="Switch to grid view" onClick={() => setLayout(layouts.grid)}>
+              <span aria-hidden="true">▦</span>
             </Icon>
           ) : (
-            <Icon onClick={() => setLayout(layouts.list)}>
-              <i className="fas fa-th-list" />
+            <Icon type="button" aria-label="Switch to list view" onClick={() => setLayout(layouts.list)}>
+              <span aria-hidden="true">☰</span>
             </Icon>
           )}
           {theme === themes.light ? (
-            <Icon onClick={() => setTheme(themes.dark)}>
-              <i className="fas fa-moon" />
+            <Icon type="button" aria-label="Switch to dark mode" onClick={() => setTheme(themes.dark)}>
+              <span aria-hidden="true">◐</span>
             </Icon>
           ) : (
-            <Icon onClick={() => setTheme(themes.light)}>
-              <i className="fas fa-sun" />
+            <Icon type="button" aria-label="Switch to light mode" onClick={() => setTheme(themes.light)}>
+              <span aria-hidden="true">☼</span>
             </Icon>
           )}
         </NavSection>
