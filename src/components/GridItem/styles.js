@@ -20,10 +20,11 @@ export const ExternalLink = styled.a`
 export const Image = styled.img`
   display: block;
   height: 240px;
-  max-width: 100%;
+  width: 100%;
   border-top-left-radius: ${RADIUS}px;
   border-top-right-radius: ${RADIUS}px;
   object-fit: cover;
+  background-color: #ff6600;
 `;
 
 export const Content = styled.div`

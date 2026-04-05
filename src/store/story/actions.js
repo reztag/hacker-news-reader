@@ -9,27 +9,38 @@ export const actionTypes = {
 };
 
 const actions = {
-  fetchStoryIds: buildRequestCreator(
-    actionTypes.FETCH_STORY_IDS,
-    ({ request, payload, dispatch }) => {
-      dispatch(request.request(payload));
-      return hackerNewsApi
-        .getTopStoryIds()
-        .then(storyIds => {
-          dispatch(request.success({ storyIds }));
-          dispatch(actions.fetchStories({ storyIds, page: 0 }));
-          return storyIds;
-        })
-        .catch(err => dispatch(request.failure(err)));
-    },
-  ),
-  fetchStories: buildRequestCreator(actionTypes.FETCH_STORIES, ({ request, payload, dispatch }) => {
+  fetchStoryIds: buildRequestCreator(actionTypes.FETCH_STORY_IDS, async ({ request, payload, dispatch }) => {
+    dispatch(request.request(payload));
+
+    try {
+      const storyIds = await hackerNewsApi.getTopStoryIds();
+      dispatch(request.success({ storyIds }));
+      await dispatch(actions.fetchStories({ storyIds, page: 0 }));
+      return storyIds;
+    } catch (error) {
+      return dispatch(request.failure({ message: error.message || 'Failed to load top stories.' }));
+    }
+  }),
+  fetchStories: buildRequestCreator(actionTypes.FETCH_STORIES, async ({ request, payload, dispatch }) => {
     const { storyIds, page } = payload;
     dispatch(request.request(payload));
-    return hackerNewsApi
-      .getStoriesByPage(storyIds, page)
-      .then(stories => dispatch(request.success({ stories })))
-      .catch(err => dispatch(request.failure(err)));
+
+    try {
+      const stories = await hackerNewsApi.getStoriesByPage(storyIds, page);
+
+      if (!stories.length) {
+        throw new Error('No stories were returned for this page.');
+      }
+
+      return dispatch(request.success({ stories, page }));
+    } catch (error) {
+      return dispatch(
+        request.failure({
+          message: error.message || 'Failed to load stories.',
+          page,
+        }),
+      );
+    }
   }),
 };
 

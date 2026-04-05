@@ -1,23 +1,17 @@
 import { applyMiddleware, compose } from 'redux';
-import thunk from 'redux-thunk';
-import { createLogger } from 'redux-logger';
+import { thunk } from 'redux-thunk';
 import localStorageMiddleware from 'store/middleware/localStorageMiddleware';
 import storageDefinitions from 'store/middleware/localStorageMiddleware/storageDefinitions';
 
-const isProd = process.env.NODE_ENV === 'production';
-const middlewareList = [];
-let devTool = f => f;
+const composeEnhancers =
+  typeof window !== 'undefined' && window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__
+    ? window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__
+    : compose;
 
-middlewareList.push(thunk);
-middlewareList.push(localStorageMiddleware(storageDefinitions));
+const middlewareList = [thunk, localStorageMiddleware(storageDefinitions)];
 
-if (!isProd) {
-  middlewareList.push(createLogger());
-}
-
-const middleware = compose(
+const middleware = composeEnhancers(
   applyMiddleware(...middlewareList),
-  devTool,
 );
 
 export default middleware;

@@ -12,7 +12,7 @@ const hasLocalStorage = (storageType = STORAGE_TYPE) => {
     storage.getItem(testKey);
     storage.removeItem(testKey);
   } catch (e) {
-    if (process.env.NODE_ENV !== 'production') {
+    if (import.meta.env.MODE !== 'production') {
       console.warn(`redux-persist ${storageType} test failed, persistence will be disabled.`);
     }
 

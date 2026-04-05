@@ -1,21 +1,15 @@
-import url from 'url';
-
 const getSiteHostname = siteUrl => {
-  let hostname = '';
-
-  if (siteUrl) {
-    if (!siteUrl.includes('//')) {
-      siteUrl = `http://${siteUrl}`;
-    }
-
-    hostname = url.parse(siteUrl).hostname;
+  if (!siteUrl) {
+    return '';
   }
 
-  if (hostname.includes('www.')) {
-    hostname = hostname.split('www.')[1];
+  try {
+    const normalizedUrl = siteUrl.includes('//') ? siteUrl : `http://${siteUrl}`;
+    const { hostname } = new URL(normalizedUrl);
+    return hostname.startsWith('www.') ? hostname.slice(4) : hostname;
+  } catch {
+    return '';
   }
-
-  return hostname;
 };
 
 export default getSiteHostname;
