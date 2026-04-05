@@ -43,31 +43,3 @@ Hacker News reader for displaying in new tab bar of Chromium browsers.
 6. Open a new tab to see the extension in action.
 
 The extension manifest uses the generated `dist/index.html`, so make sure the build step has completed before loading the unpacked extension.
-
-## Run As A Web App
-
-If you want to run it as a web app:
-
-1. Install dependencies.
-
-   ```sh
-   npm install
-   ```
-
-2. Start the Vite dev server.
-
-   ```sh
-   npm run dev
-   ```
-
-3. Open the local URL shown in the terminal, usually:
-
-   ```txt
-   http://localhost:5173
-   ```
-
-### Optional Checks
-
-- Run the test suite with `npm run test`
-- Create a production build with `npm run build`
-- Preview the production build with `npm run preview`
