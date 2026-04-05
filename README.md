@@ -1,70 +1,73 @@
-### Created by [Skilled.dev - Coding Interview Course](https://skilled.dev) and [gitconnected - Developer News and Coding Tutorials](https://gitconnected.com)
+# Hacker News Reader
 
-## Project Overview
-
-A Hacker News clone (in night mode!) using all open source technology.
-
-Try it out: [Download the Chrome Extension](https://chrome.google.com/webstore/detail/hacker-news/hknoigmfpgfdkccnkbfbjfnocoegoefe?pli=1&authuser=1)
-
-Design inspired by [Daily Now](https://www.dailynow.co/) - Curated dev news for busy developers
-
-Use our solution or following along with our tutorial to build your own using React and Redux.
-
-## What You'll Learn
-
--   React
--   Redux
--   Styled Components
--   CSS Grid
--   CSS Flex
--   CSS Animations
--   Using an API
--   Axios for network requests
--   Redux middleware
--   Create React App to bootstrap a project
--   localStorage for persisting state
+> A lightweight Hacker News reader: built with React, Redux, and Vite, and designed to work both as a regular web app as well as a Chrome extension.
 
 
-## Step-by-step Tutorial
+## Highlights
 
-**Written tutorial**
-Follow along and move your own pace using the [gitconnected tutorial](https://gitconnected.com/courses/learn-react-redux-tutorial-build-a-hacker-news-clone).
-    
-**Video Tutorial**
-http://www.youtube.com/watch?v=oGB_VPrld0U&index=2&list=PLTTC1K14KAxHj6AftnRUD28SQaoVauvl3
-[![React Tutorial](http://img.youtube.com/vi/oGB_VPrld0U/0.jpg)](http://www.youtube.com/watch?v=oGB_VPrld0U&index=2&list=PLTTC1K14KAxHj6AftnRUD28SQaoVauvl3)
+- React UI
+- Redux state management and middleware
+- Infinite scrolling story feed
+- Link preview support
+- Comment box which polls the discussion count
+- Responsive layout
+- Chrome Manifest V3 support
 
-## Getting Started
+## Tech Stack
 
-Run the completed project to understand what you're building
+| Area | Tooling |
+| --- | --- |
+| App runtime | React 18 |
+| State | Redux, Redux Thunk, Reselect |
+| Styling | Styled Components |
+| Build | Vite |
+| Testing | Vitest, Testing Library, JSDOM |
 
-```sh
-# Clone the project
-git clone https://github.com/gitconnected/hacker-news-reader.git
+## Installation As A Chrome Extension
 
-# Install dependencies
-npm install
+1. Build the app first.
 
-# Start the project
-npm run start
+   ```sh
+   npm install
+   npm run build
+   ```
 
-# Navigate to http://localhost:3000
-```
+2. Open Chrome and go to `chrome://extensions`.
 
-To build your own from scratch, first initialize the project. Our solution uses [Create React App](https://github.com/facebook/create-react-app).
+3. Turn on Developer mode.
 
-Review the [Hacker New API](https://github.com/HackerNews/API)
-documentation. You will need the `/topstories` endpoint to get the list of the
-story IDs and the `/item` endpoint to get the data for each story individually.
+4. Click **Load unpacked**.
 
-Finally, get your project into production. We chose to use a Chrome Extension, but
-you can host it in any manner than you wish. GitHub Pages is a great option and we will show you a simple way to deploy any Create React Project to GH Pages. The final solution should show a list of the top stories on Hacker News.
+5. Select the project root folder: `hacker-news-reader`.
 
-Join the [Slack channel](https://community.gitconnected.com) to
-collaborate and get help. This project can be difficult, so make sure you work on it with some friends!
+6. Open a new tab to see the extension in action.
 
-## Demo
+The extension manifest uses the generated `dist/index.html`, so make sure the build step has completed before loading the unpacked extension.
 
-![Hacktoberfest Demo](https://media.giphy.com/media/3HwA2U7rZgn0pRnV9f/giphy.gif 'Hacktoberfest Demo')
+## Run As A Web App
 
-![Hacktoberfest Screenshot](https://github.com/gitconnected/hacker-news-reader/raw/master/public/hacktoberfest-screenshot.png 'Hacktoberfest Screenshot')
+If you want to run it as a web app:
+
+1. Install dependencies.
+
+   ```sh
+   npm install
+   ```
+
+2. Start the Vite dev server.
+
+   ```sh
+   npm run dev
+   ```
+
+3. Open the local URL shown in the terminal, usually:
+
+   ```txt
+   http://localhost:5173
+   ```
+
+### Optional Checks
+
+- Run the test suite with `npm run test`
+- Create a production build with `npm run build`
+- Preview the production build with `npm run preview`
