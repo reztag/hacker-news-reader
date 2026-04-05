@@ -1,6 +1,6 @@
 # Hacker News Reader
 
-> A lightweight Hacker News reader: built with React, Redux, and Vite, to be accessible on new tab page.
+Hacker News reader for displaying in new tab bar of Chromium browsers.
 
 
 ## Highlights
