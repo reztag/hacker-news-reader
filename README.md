@@ -1,17 +1,17 @@
 # Hacker News Reader
 
-> A lightweight Hacker News reader: built with React, Redux, and Vite, and designed to work both as a regular web app as well as a Chrome extension.
+> A lightweight Hacker News reader: built with React, Redux, and Vite, to be accessible on new tab page.
 
 
 ## Highlights
 
+- Updated to support chrome Manifest V3
 - React UI
 - Redux state management and middleware
 - Infinite scrolling story feed
 - Link preview support
-- Comment box which polls the discussion count
-- Responsive layout
-- Chrome Manifest V3 support
+- Comment box icon which polls the discussion count
+- Responsive layout and cleaner codebase
 
 ## Tech Stack
 
