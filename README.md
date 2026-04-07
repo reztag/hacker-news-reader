@@ -3,7 +3,7 @@
 Hacker News reader for displaying in new tab bar of Chromium browsers.
 
 
-## Highlights
+## Features
 
 - Updated to support chrome Manifest V3
 - React UI
@@ -12,6 +12,8 @@ Hacker News reader for displaying in new tab bar of Chromium browsers.
 - Link preview support
 - Comment box icon which polls the discussion count
 - Responsive layout and cleaner codebase
+- Uses fallback images for Twitter and Reddit (as they block bots)
+
 
 ## Tech Stack
 

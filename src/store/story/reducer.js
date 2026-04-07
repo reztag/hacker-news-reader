@@ -9,13 +9,25 @@ const getInitialState = () => ({
   pageError: '',
 });
 
+const dedupeStories = stories => {
+  const seenStoryIds = new Set();
+
+  return stories.filter(story => {
+    if (!story || typeof story.id !== 'number' || seenStoryIds.has(story.id)) {
+      return false;
+    }
+
+    seenStoryIds.add(story.id);
+    return true;
+  });
+};
+
 const story = (state = getInitialState(), { type, payload }) => {
   switch (type) {
     case `${actionTypes.FETCH_STORY_IDS}_REQUEST`:
       return {
-        ...state,
+        ...getInitialState(),
         isFetching: true,
-        error: '',
       };
     case `${actionTypes.FETCH_STORIES}_REQUEST`:
       return {
@@ -26,14 +38,16 @@ const story = (state = getInitialState(), { type, payload }) => {
     case `${actionTypes.FETCH_STORY_IDS}_SUCCESS`:
       return {
         ...state,
-        ...payload,
+        storyIds: payload.storyIds,
         error: '',
       };
     case `${actionTypes.FETCH_STORIES}_SUCCESS`:
+      const stories = payload.page === 0 ? payload.stories : [...state.stories, ...payload.stories];
+
       return {
         ...state,
-        stories: [...state.stories, ...payload.stories],
-        page: state.page + 1,
+        stories: dedupeStories(stories),
+        page: payload.page + 1,
         isFetching: false,
         error: '',
         pageError: '',

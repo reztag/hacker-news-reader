@@ -3,6 +3,8 @@ import { Provider } from 'react-redux';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import configureStore from 'store';
 import App from './App.jsx';
+import loadInitialState from 'store/middleware/localStorageMiddleware/loadInitialState';
+import { FEED_CACHE_KEY, FEED_CACHE_TTL_MS } from 'store/middleware/localStorageMiddleware/feedCache';
 
 vi.mock('react-infinite-scroll-component', () => ({
   default: ({ children, next, hasMore }) => (
@@ -25,8 +27,8 @@ vi.mock('react-timeago', () => ({
   default: ({ date }) => React.createElement('time', null, String(date)),
 }));
 
-const renderApp = () => {
-  const store = configureStore({});
+const renderApp = (initialState = {}) => {
+  const store = configureStore(initialState);
   return render(
     React.createElement(
       Provider,
@@ -55,6 +57,7 @@ const createFetchResponse = value => ({
 describe('App', () => {
   afterEach(() => {
     vi.restoreAllMocks();
+    localStorage.clear();
   });
 
   it('loads and renders the first page of stories', async () => {
@@ -135,5 +138,51 @@ describe('App', () => {
         'https://hacker-news.firebaseio.com/v0/item/21.json',
       );
     });
+  });
+
+  it('hydrates a fresh cached feed without fetching immediately', async () => {
+    localStorage.setItem(
+      FEED_CACHE_KEY,
+      JSON.stringify({
+        storyIds: [1],
+        stories: [buildStory(1)],
+        page: 1,
+        fetchedAt: Date.now(),
+      }),
+    );
+
+    const fetchSpy = vi.spyOn(global, 'fetch');
+
+    renderApp(loadInitialState());
+
+    expect(screen.getByText('Story 1')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(fetchSpy).not.toHaveBeenCalled();
+    });
+  });
+
+  it('fetches from the network when the cached feed is expired', async () => {
+    localStorage.setItem(
+      FEED_CACHE_KEY,
+      JSON.stringify({
+        storyIds: [1],
+        stories: [buildStory(1)],
+        page: 1,
+        fetchedAt: Date.now() - FEED_CACHE_TTL_MS - 1,
+      }),
+    );
+
+    vi.spyOn(global, 'fetch').mockImplementation(url => {
+      if (url.endsWith('/topstories.json')) {
+        return Promise.resolve(createFetchResponse([2]));
+      }
+
+      return Promise.resolve(createFetchResponse(buildStory(2)));
+    });
+
+    renderApp(loadInitialState());
+
+    expect(await screen.findByText('Story 2')).toBeInTheDocument();
+    expect(global.fetch).toHaveBeenCalledWith('https://hacker-news.firebaseio.com/v0/topstories.json');
   });
 });

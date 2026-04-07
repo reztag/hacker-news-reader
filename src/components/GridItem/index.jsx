@@ -17,17 +17,36 @@ import {
   CommentIcon,
 } from './styles';
 
-const FALLBACK_THUMBNAIL = 'https://miro.medium.com/max/1176/1*F9RzuXseG1VrTjFJd403gw.png';
+// Use a locally bundled copy of the original Miro fallback image so the thumbnail does not depend on remote hosts.
+const FALLBACK_THUMBNAIL = `${import.meta.env.BASE_URL}fallback-thumbnail.png`;
+const X_THUMBNAIL = `${import.meta.env.BASE_URL}x-thumbnail.png`;
+
+const isXPreviewHostname = hostname =>
+  hostname === 'x.com' ||
+  hostname === 'twitter.com' ||
+  hostname.endsWith('.x.com') ||
+  hostname.endsWith('.twitter.com');
 
 const GridItem = ({ url, title, id, kids = [], descendants, useEmojiIcon = false }) => {
   const site = getSiteHostname(url) || 'news.ycombinator.com';
   const link = getArticleLink({ url, id });
   const commentUrl = `${HN_ITEM}${id}`;
   const commentCount = typeof descendants === 'number' ? descendants : kids.length;
-  const [imageSrc, setImageSrc] = useState(FALLBACK_THUMBNAIL);
+  const isXLink = isXPreviewHostname(site);
+  const fallbackImageSrc = isXLink
+    ? X_THUMBNAIL
+    : FALLBACK_THUMBNAIL;
+  const [imageSrc, setImageSrc] = useState(fallbackImageSrc);
 
   useEffect(() => {
     let isMounted = true;
+    setImageSrc(fallbackImageSrc);
+
+    if (isXLink) {
+      return () => {
+        isMounted = false;
+      };
+    }
 
     linkPreviewApi.getPreviewImage(link).then(previewImageUrl => {
       if (isMounted && previewImageUrl) {
@@ -38,7 +57,7 @@ const GridItem = ({ url, title, id, kids = [], descendants, useEmojiIcon = false
     return () => {
       isMounted = false;
     };
-  }, [link]);
+  }, [fallbackImageSrc, isXLink, link]);
 
   return (
     <a href={link} target="_blank" rel="nofollow noreferrer nofollow">
@@ -49,8 +68,8 @@ const GridItem = ({ url, title, id, kids = [], descendants, useEmojiIcon = false
             alt={`${site} thumbnail`}
             loading="lazy"
             onError={() => {
-              if (imageSrc !== FALLBACK_THUMBNAIL) {
-                setImageSrc(FALLBACK_THUMBNAIL);
+              if (imageSrc !== fallbackImageSrc) {
+                setImageSrc(fallbackImageSrc);
               }
             }}
           />
@@ -66,7 +85,7 @@ const GridItem = ({ url, title, id, kids = [], descendants, useEmojiIcon = false
                 onClick={event => event.stopPropagation()}
               >
                 {useEmojiIcon ? (
-                  <span aria-hidden="true">💬</span>
+                  <span aria-hidden="true">{'\u{1F4AC}'}</span>
                 ) : (
                   <CommentIcon viewBox="0 0 24 24" aria-hidden="true">
                     <path

@@ -13,7 +13,7 @@
     "service_worker": "extension-background.js"
   },
   "content_security_policy": {
-    "extension_pages": "script-src 'self'; object-src 'self'; img-src 'self' data: https:; connect-src 'self' https:;"
+    "extension_pages": "script-src 'self'; object-src 'self'; img-src 'self' data: https:; connect-src 'self' https: http:;"
   },
   "icons": {
     "16": "public/favicon.ico",

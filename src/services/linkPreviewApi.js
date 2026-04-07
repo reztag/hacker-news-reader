@@ -1,4 +1,6 @@
-const previewCache = new Map();
+const PREVIEW_CACHE_KEY = '@@hackerNewsReader/storage/previewCache';
+const PREVIEW_CACHE_TTL_MS = 60 * 60 * 1000;
+const inFlightPreviewRequests = new Map();
 
 const META_SELECTORS = [
   'meta[property="og:image:secure_url"]',
@@ -29,13 +31,15 @@ const parsePreviewImage = ({ html, url }) => {
     const content = document.querySelector(selector)?.getAttribute('content');
     const absoluteUrl = getAbsoluteUrl({ value: content, baseUrl: url });
 
-    if (absoluteUrl) {
-      return absoluteUrl;
+    const normalizedPreviewUrl = normalizePreviewImageUrl(absoluteUrl);
+
+    if (normalizedPreviewUrl) {
+      return normalizedPreviewUrl;
     }
   }
 
   const firstImage = document.querySelector('article img, main img, img')?.getAttribute('src');
-  return getAbsoluteUrl({ value: firstImage, baseUrl: url });
+  return normalizePreviewImageUrl(getAbsoluteUrl({ value: firstImage, baseUrl: url }));
 };
 
 const isExtensionRuntimeAvailable = () =>
@@ -43,6 +47,105 @@ const isExtensionRuntimeAvailable = () =>
   !!chrome.runtime &&
   typeof chrome.runtime.sendMessage === 'function' &&
   chrome.runtime.id;
+
+const hasLocalStorage = () => {
+  try {
+    return typeof window !== 'undefined' && !!window.localStorage;
+  } catch {
+    return false;
+  }
+};
+
+const normalizePreviewImageUrl = url => {
+  if (!url) {
+    return '';
+  }
+
+  try {
+    const normalizedUrl = new URL(url);
+
+    if (normalizedUrl.protocol === 'http:') {
+      normalizedUrl.protocol = 'https:';
+    }
+
+    if (normalizedUrl.protocol === 'https:' || normalizedUrl.protocol === 'data:') {
+      return normalizedUrl.toString();
+    }
+
+    return '';
+  } catch {
+    return '';
+  }
+};
+
+const loadPreviewCache = () => {
+  if (!hasLocalStorage()) {
+    return {};
+  }
+
+  try {
+    return JSON.parse(localStorage.getItem(PREVIEW_CACHE_KEY) || '{}');
+  } catch {
+    return {};
+  }
+};
+
+const savePreviewCache = cache => {
+  if (!hasLocalStorage()) {
+    return;
+  }
+
+  try {
+    localStorage.setItem(PREVIEW_CACHE_KEY, JSON.stringify(cache));
+  } catch {
+    // Ignore write errors.
+  }
+};
+
+const getCachedPreviewEntry = (url, now = Date.now()) => {
+  const previewCache = loadPreviewCache();
+  const cachedEntry = previewCache[url];
+
+  if (!cachedEntry) {
+    return null;
+  }
+
+  if (typeof cachedEntry.fetchedAt !== 'number' || now - cachedEntry.fetchedAt >= PREVIEW_CACHE_TTL_MS) {
+    delete previewCache[url];
+    savePreviewCache(previewCache);
+    return null;
+  }
+
+  const imageUrl = normalizePreviewImageUrl(cachedEntry.imageUrl);
+
+  if (cachedEntry.imageUrl && !imageUrl) {
+    delete previewCache[url];
+    savePreviewCache(previewCache);
+    return null;
+  }
+
+  if (cachedEntry.imageUrl !== imageUrl) {
+    previewCache[url] = {
+      ...cachedEntry,
+      imageUrl,
+    };
+    savePreviewCache(previewCache);
+  }
+
+  return {
+    ...cachedEntry,
+    imageUrl,
+  };
+};
+
+const cachePreviewEntry = (url, imageUrl, now = Date.now()) => {
+  const previewCache = loadPreviewCache();
+  previewCache[url] = {
+    imageUrl: normalizePreviewImageUrl(imageUrl),
+    fetchedAt: now,
+  };
+  savePreviewCache(previewCache);
+};
 
 const fetchPreviewHtml = url => {
   if (isExtensionRuntimeAvailable()) {
@@ -77,15 +180,36 @@ const getPreviewImage = async url => {
     return '';
   }
 
-  if (!previewCache.has(url)) {
-    const previewRequest = fetchPreviewHtml(url)
-      .then(html => parsePreviewImage({ html, url }))
-      .catch(() => '');
+  const cachedEntry = getCachedPreviewEntry(url);
 
-    previewCache.set(url, previewRequest);
+  if (cachedEntry) {
+    return cachedEntry.imageUrl || '';
   }
 
-  return previewCache.get(url);
+  if (!inFlightPreviewRequests.has(url)) {
+    const previewRequest = fetchPreviewHtml(url)
+      .then(html => parsePreviewImage({ html, url }))
+      .catch(() => '')
+      .then(imageUrl => {
+        cachePreviewEntry(url, imageUrl);
+        return imageUrl;
+      })
+      .finally(() => {
+        inFlightPreviewRequests.delete(url);
+      });
+
+    inFlightPreviewRequests.set(url, previewRequest);
+  }
+
+  return inFlightPreviewRequests.get(url);
+};
+
+export const __resetPreviewCacheForTests = () => {
+  inFlightPreviewRequests.clear();
+
+  if (hasLocalStorage()) {
+    localStorage.removeItem(PREVIEW_CACHE_KEY);
+  }
 };
 
 export default {

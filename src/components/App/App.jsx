@@ -13,10 +13,6 @@ import { hasMoreStoriesSelector, storyStatusSelector } from 'store/story/selecto
 
 import {
   Wrapper,
-  Title,
-  TitleWrapper,
-  GithubLink,
-  SocialLink,
   StateCard,
   StateMessage,
   RetryButton,
@@ -40,8 +36,12 @@ const App = () => {
     }
 
     hasRequestedInitialStories.current = true;
+    if (storyIds.length > 0 && stories.length > 0) {
+      return;
+    }
+
     dispatch(storyActions.fetchStoryIds());
-  }, [dispatch]);
+  }, [dispatch, stories.length, storyIds.length]);
 
   useEffect(() => {
     document.body.style.backgroundColor =
@@ -63,32 +63,6 @@ const App = () => {
       <div>
         <Nav />
         <Wrapper>
-          <TitleWrapper>
-            <Title>
-              <div>{'// Hacker News Reader'}</div>
-              <GithubLink href="https://github.com/gitconnected/hacker-news-reader" target="_blank">
-                (build your own)
-              </GithubLink>
-            </Title>
-            <div>
-              <SocialLink href="https://twitter.com/gitconnected" target="_blank">
-                Twitter
-              </SocialLink>
-              <SocialLink href="https://community.gitconnected.com" target="_blank">
-                Slack
-              </SocialLink>
-              <SocialLink href="https://levelup.gitconnected.com" target="_blank">
-                Medium
-              </SocialLink>
-              <SocialLink href="https://www.facebook.com/gitconnectednetwork" target="_blank">
-                Facebook
-              </SocialLink>
-              <SocialLink href="https://gitconnected.com" target="_blank">
-                Site
-              </SocialLink>
-            </div>
-          </TitleWrapper>
-
           {!hasStories && isFetching ? (
             <StateCard data-testid="initial-loader">
               <Loader />
