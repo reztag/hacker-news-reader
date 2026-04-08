@@ -3,18 +3,25 @@ import styled from 'styled-components';
 const RADIUS = 4;
 
 export const Item = styled.li`
+  min-width: 0;
   height: 100%;
 `;
 
 export const Card = styled.div`
   flex-direction: column;
   display: flex;
+  min-width: 0;
   height: 100%;
 `;
 
-export const ExternalLink = styled.a`
+export const ExternalLink = styled.div`
   display: flex;
   flex-direction: column;
+  min-width: 0;
+  width: 100%;
+  height: 100%;
+  color: inherit;
+  cursor: pointer;
 `;
 
 export const Image = styled.img`
@@ -64,12 +71,17 @@ export const Source = styled.div`
   font-size: 16px;
 `;
 
-export const CommentLink = styled.a`
+export const CommentButton = styled.button`
+  background: none;
+  border: 0;
   color: ${({ theme }) => theme.textSecondary};
   display: inline-flex;
   align-items: center;
   gap: 6px;
   flex-shrink: 0;
+  cursor: pointer;
+  font: inherit;
+  padding: 0;
 `;
 
 export const CommentCount = styled.span`
