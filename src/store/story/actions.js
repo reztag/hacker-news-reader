@@ -27,12 +27,13 @@ const actions = {
 
     try {
       const stories = await hackerNewsApi.getStoriesByPage(storyIds, page);
+      const fetchedAt = Date.now();
 
       if (!stories.length) {
         throw new Error('No stories were returned for this page.');
       }
 
-      return dispatch(request.success({ stories, page }));
+      return dispatch(request.success({ stories, page, fetchedAt }));
     } catch (error) {
       return dispatch(
         request.failure({

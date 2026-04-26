@@ -5,4 +5,6 @@ export const createCachedStoryState = cache => ({
   isFetching: false,
   error: '',
   pageError: '',
+  lastFetchedAt: cache.fetchedAt,
+  hasFreshCache: !!cache.isFresh,
 });

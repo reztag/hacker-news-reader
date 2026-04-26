@@ -7,6 +7,8 @@ const getInitialState = () => ({
   isFetching: false,
   error: '',
   pageError: '',
+  lastFetchedAt: 0,
+  hasFreshCache: false,
 });
 
 const dedupeStories = stories => {
@@ -26,8 +28,10 @@ const story = (state = getInitialState(), { type, payload }) => {
   switch (type) {
     case `${actionTypes.FETCH_STORY_IDS}_REQUEST`:
       return {
-        ...getInitialState(),
+        ...state,
         isFetching: true,
+        error: '',
+        pageError: '',
       };
     case `${actionTypes.FETCH_STORIES}_REQUEST`:
       return {
@@ -51,17 +55,22 @@ const story = (state = getInitialState(), { type, payload }) => {
         isFetching: false,
         error: '',
         pageError: '',
+        lastFetchedAt: payload.fetchedAt,
+        hasFreshCache: true,
       };
     case `${actionTypes.FETCH_STORY_IDS}_FAILURE`:
       return {
         ...state,
         isFetching: false,
-        error: payload.message,
+        ...(state.stories.length === 0
+          ? { error: payload.message, pageError: '' }
+          : { error: '', pageError: payload.message }),
       };
     case `${actionTypes.FETCH_STORIES}_FAILURE`:
       return {
         ...state,
         isFetching: false,
+        hasFreshCache: false,
         ...(state.stories.length === 0
           ? { error: payload.message, pageError: '' }
           : { pageError: payload.message }),

@@ -1,8 +1,23 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { layouts, themes } from 'store/app/utils';
+import formatElapsedTime from 'utils/formatElapsedTime';
 
-import { Header, Spacer, NavSection, Content, Brand, ControlButton, ControlIcon, ControlLabel } from './styles';
+import {
+  Header,
+  Spacer,
+  NavSection,
+  CenterSection,
+  RightSection,
+  Content,
+  Brand,
+  ControlButton,
+  ControlIcon,
+  ControlLabel,
+  StatusPill,
+  StatusText,
+  RefreshButton,
+} from './styles';
 
 const GridIcon = () => (
   <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -55,14 +70,36 @@ const InfoIcon = () => (
   </svg>
 );
 
-const Nav = ({ layout, theme, setLayout, setTheme }) => (
-  <div>
-    <Header>
-      <Content>
-        <NavSection>
-          <Brand>{'// Hacker News Reader'}</Brand>
-        </NavSection>
-        <NavSection>
+const Nav = ({
+  layout,
+  theme,
+  setLayout,
+  setTheme,
+  lastFetchedAt = 0,
+  showStaleStatus = false,
+  onRefresh,
+  isRefreshing = false,
+}) => {
+  const elapsed = formatElapsedTime(lastFetchedAt);
+
+  return (
+    <div>
+      <Header>
+        <Content>
+          <NavSection>
+            <Brand>{'// Hacker News Reader'}</Brand>
+          </NavSection>
+          <CenterSection>
+            {showStaleStatus ? (
+              <StatusPill role="status" aria-live="polite">
+                <StatusText>{`Cached feed from ${elapsed} ago`}</StatusText>
+                <RefreshButton type="button" onClick={onRefresh} disabled={isRefreshing} aria-label="Refresh stories now">
+                  {isRefreshing ? '...' : 'Refresh'}
+                </RefreshButton>
+              </StatusPill>
+            ) : null}
+          </CenterSection>
+          <RightSection>
           {layout === layouts.list ? (
             <ControlButton type="button" aria-label="Switch to grid view" onClick={() => setLayout(layouts.grid)}>
               <ControlIcon>
@@ -99,18 +136,23 @@ const Nav = ({ layout, theme, setLayout, setTheme }) => (
             </ControlIcon>
             <ControlLabel>About</ControlLabel>
           </ControlButton>
-        </NavSection>
-      </Content>
-    </Header>
-    <Spacer />
-  </div>
-);
+          </RightSection>
+        </Content>
+      </Header>
+      <Spacer />
+    </div>
+  );
+};
 
 Nav.propTypes = {
   layout: PropTypes.string.isRequired,
   theme: PropTypes.string.isRequired,
   setLayout: PropTypes.func.isRequired,
   setTheme: PropTypes.func.isRequired,
+  lastFetchedAt: PropTypes.number,
+  showStaleStatus: PropTypes.bool,
+  onRefresh: PropTypes.func.isRequired,
+  isRefreshing: PropTypes.bool,
 };
 
 export default Nav;

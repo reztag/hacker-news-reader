@@ -10,6 +10,7 @@ import storyActions from 'store/story/actions';
 import { layouts, themes } from 'store/app/utils';
 import { colorsDark, colorsLight } from 'styles/palette';
 import { hasMoreStoriesSelector, storyStatusSelector } from 'store/story/selectors';
+import { FEED_CACHE_TTL_MS } from 'store/middleware/localStorageMiddleware/feedCache';
 
 import {
   Wrapper,
@@ -17,31 +18,56 @@ import {
   StateMessage,
   RetryButton,
   InlineMessage,
+  LoaderMessage,
 } from './styles';
 
 const App = () => {
   const dispatch = useDispatch();
-  const hasRequestedInitialStories = useRef(false);
+  const hasAttemptedInitialLoad = useRef(false);
+  const staleRefreshAttemptedFor = useRef(null);
   const layout = useSelector(state => state.app.layout);
   const theme = useSelector(state => state.app.theme);
   const stories = useSelector(state => state.story.stories);
   const page = useSelector(state => state.story.page);
   const storyIds = useSelector(state => state.story.storyIds);
   const hasMoreStories = useSelector(hasMoreStoriesSelector);
-  const { hasStories, isFetching, error, pageError } = useSelector(storyStatusSelector);
+  const { hasStories, isFetching, error, pageError, lastFetchedAt } = useSelector(storyStatusSelector);
+
+  const requestStoryRefresh = payload => {
+    if (!isFetching) {
+      dispatch(storyActions.fetchStoryIds(payload));
+    }
+  };
 
   useEffect(() => {
-    if (hasRequestedInitialStories.current) {
-      return;
+    if (isFetching) {
+      return undefined;
     }
 
-    hasRequestedInitialStories.current = true;
-    if (storyIds.length > 0 && stories.length > 0) {
-      return;
+    if (!hasStories && !hasAttemptedInitialLoad.current) {
+      hasAttemptedInitialLoad.current = true;
+      requestStoryRefresh();
+      return undefined;
     }
 
-    dispatch(storyActions.fetchStoryIds());
-  }, [dispatch, stories.length, storyIds.length]);
+    const now = Date.now();
+    const age = lastFetchedAt > 0 ? now - lastFetchedAt : FEED_CACHE_TTL_MS;
+    const isStale = age >= FEED_CACHE_TTL_MS;
+
+    if (isStale && staleRefreshAttemptedFor.current !== lastFetchedAt) {
+      staleRefreshAttemptedFor.current = lastFetchedAt;
+      requestStoryRefresh();
+    }
+
+    const delay = isStale ? FEED_CACHE_TTL_MS : FEED_CACHE_TTL_MS - age;
+    const timerId = window.setTimeout(() => {
+      requestStoryRefresh();
+    }, Math.max(1000, delay));
+
+    return () => {
+      window.clearTimeout(timerId);
+    };
+  }, [hasStories, isFetching, lastFetchedAt, error]);
 
   useEffect(() => {
     document.body.style.backgroundColor =
@@ -55,7 +81,8 @@ const App = () => {
   };
 
   const refreshStories = () => {
-    dispatch(storyActions.fetchStoryIds());
+    staleRefreshAttemptedFor.current = null;
+    requestStoryRefresh({ force: true });
   };
 
   return (
@@ -65,8 +92,8 @@ const App = () => {
         <Wrapper>
           {!hasStories && isFetching ? (
             <StateCard data-testid="initial-loader">
-              <Loader />
-              <StateMessage>Loading top stories...</StateMessage>
+              <Loader size={88} />
+              <LoaderMessage>Fetching top stories...</LoaderMessage>
             </StateCard>
           ) : null}
 
@@ -93,7 +120,12 @@ const App = () => {
                 dataLength={stories.length}
                 next={fetchStories}
                 hasMore={hasMoreStories && !pageError}
-                loader={<InlineMessage>Loading more stories...</InlineMessage>}
+                loader={
+                  <InlineMessage>
+                    <Loader size={88} />
+                    <LoaderMessage>Loading stories...</LoaderMessage>
+                  </InlineMessage>
+                }
                 style={{
                   height: '100%',
                   overflow: 'visible',

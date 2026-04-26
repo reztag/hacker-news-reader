@@ -24,22 +24,36 @@ describe('loadInitialState', () => {
         isFetching: false,
         error: '',
         pageError: '',
+        lastFetchedAt: cachedFeed.fetchedAt,
+        hasFreshCache: true,
       },
     });
   });
 
-  it('ignores an expired feed cache', () => {
+  it('hydrates an expired feed cache so stale content remains available offline', () => {
+    const fetchedAt = Date.now() - FEED_CACHE_TTL_MS - 1;
+
     localStorage.setItem(
       FEED_CACHE_KEY,
       JSON.stringify({
         storyIds: [1],
         stories: [{ id: 1, title: 'Expired story' }],
         page: 1,
-        fetchedAt: Date.now() - FEED_CACHE_TTL_MS - 1,
+        fetchedAt,
       }),
     );
 
-    expect(loadInitialState()).toEqual({});
-    expect(localStorage.getItem(FEED_CACHE_KEY)).toBeNull();
+    expect(loadInitialState()).toEqual({
+      story: {
+        storyIds: [1],
+        stories: [{ id: 1, title: 'Expired story' }],
+        page: 1,
+        isFetching: false,
+        error: '',
+        pageError: '',
+        lastFetchedAt: fetchedAt,
+        hasFreshCache: false,
+      },
+    });
   });
 });

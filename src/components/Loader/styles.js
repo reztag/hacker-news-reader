@@ -26,13 +26,17 @@ const blink = keyframes`
 
 export const Animation = styled.div`
   text-align: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: ${({ $size }) => $size}px;
 
   span {
     color: ${({ theme }) => theme.textSecondary};
     display: inline-block;
     margin-left: 4px;
     margin-right: 4px;
-    font-size: 80px;
+    font-size: ${({ $size }) => Math.max(32, $size)}px;
     line-height: 0.1;
 
     /**

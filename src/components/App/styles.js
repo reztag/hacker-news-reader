@@ -23,13 +23,16 @@ export const StateCard = styled.div`
   margin-bottom: 20px;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: center;
+  text-align: center;
   gap: 16px;
 `;
 
 export const StateMessage = styled.p`
   margin: 0;
   color: ${({ theme }) => theme.textSecondary};
+  font-size: 18px;
+  line-height: 1.5;
 `;
 
 export const RetryButton = styled.button`
@@ -43,6 +46,22 @@ export const RetryButton = styled.button`
 `;
 
 export const InlineMessage = styled.div`
-  padding: 16px 0 24px;
+  padding: 28px 0 40px;
   color: ${({ theme }) => theme.textSecondary};
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  text-align: center;
+  width: 100%;
+`;
+
+export const LoaderMessage = styled.p`
+  margin: 0;
+  color: ${({ theme }) => theme.textSecondary};
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  line-height: 1.5;
 `;

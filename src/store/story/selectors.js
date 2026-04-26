@@ -5,6 +5,8 @@ const storiesSelector = state => state.story.stories;
 const errorSelector = state => state.story.error;
 const pageErrorSelector = state => state.story.pageError;
 const isFetchingSelector = state => state.story.isFetching;
+const lastFetchedAtSelector = state => state.story.lastFetchedAt;
+const hasFreshCacheSelector = state => state.story.hasFreshCache;
 
 export const hasMoreStoriesSelector = createSelector(
   storyIdsSelector,
@@ -17,10 +19,14 @@ export const storyStatusSelector = createSelector(
   isFetchingSelector,
   errorSelector,
   pageErrorSelector,
-  (stories, isFetching, error, pageError) => ({
+  lastFetchedAtSelector,
+  hasFreshCacheSelector,
+  (stories, isFetching, error, pageError, lastFetchedAt, hasFreshCache) => ({
     hasStories: stories.length > 0,
     isFetching,
     error,
     pageError,
+    lastFetchedAt,
+    hasFreshCache,
   }),
 );

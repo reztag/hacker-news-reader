@@ -14,19 +14,13 @@ const storageDefinitions = {
   [actionTypes.SET_LAYOUT]: [
     ({ action, saveState }) => saveState({ state: action.payload.layout, storageKey: LAYOUT_KEY }),
   ],
-  [`${storyActionTypes.FETCH_STORY_IDS}_REQUEST`]: [
-    ({ saveState }) => saveState({ state: undefined, storageKey: FEED_CACHE_KEY }),
-  ],
   [`${storyActionTypes.FETCH_STORIES}_SUCCESS`]: [
-    ({ action, nextState }) => {
-      if (action.payload.page !== 0) {
-        return;
-      }
-
+    ({ nextState }) => {
       saveFeedCache({
         storyIds: nextState.story.storyIds,
         stories: nextState.story.stories,
         page: nextState.story.page,
+        fetchedAt: nextState.story.lastFetchedAt,
       });
     },
   ],

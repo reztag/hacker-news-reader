@@ -37,9 +37,6 @@ const GridItem = ({ url, title, id, kids = [], descendants, useEmojiIcon = false
   const fallbackImageSrc = isXLink
     ? X_THUMBNAIL
     : FALLBACK_THUMBNAIL;
-  const openArticle = () => {
-    window.open(link, '_blank', 'noopener,noreferrer');
-  };
   const [imageSrc, setImageSrc] = useState(fallbackImageSrc);
 
   useEffect(() => {
@@ -65,18 +62,7 @@ const GridItem = ({ url, title, id, kids = [], descendants, useEmojiIcon = false
 
   return (
     <Item>
-      <ExternalLink
-        role="link"
-        tabIndex={0}
-        aria-label={`Open ${title}`}
-        onClick={openArticle}
-        onKeyDown={event => {
-          if (event.key === 'Enter' || event.key === ' ') {
-            event.preventDefault();
-            openArticle();
-          }
-        }}
-      >
+      <ExternalLink>
         <Card>
           <Image
             src={imageSrc}

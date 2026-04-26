@@ -110,7 +110,7 @@ const getCachedPreviewEntry = (url, now = Date.now()) => {
     return null;
   }
 
-  if (typeof cachedEntry.fetchedAt !== 'number' || now - cachedEntry.fetchedAt >= PREVIEW_CACHE_TTL_MS) {
+  if (typeof cachedEntry.fetchedAt !== 'number') {
     delete previewCache[url];
     savePreviewCache(previewCache);
     return null;
@@ -135,6 +135,7 @@ const getCachedPreviewEntry = (url, now = Date.now()) => {
   return {
     ...cachedEntry,
     imageUrl,
+    isFresh: now - cachedEntry.fetchedAt < PREVIEW_CACHE_TTL_MS,
   };
 };
 
@@ -175,17 +176,7 @@ const fetchPreviewHtml = url => {
   });
 };
 
-const getPreviewImage = async url => {
-  if (!url) {
-    return '';
-  }
-
-  const cachedEntry = getCachedPreviewEntry(url);
-
-  if (cachedEntry) {
-    return cachedEntry.imageUrl || '';
-  }
-
+const refreshPreviewImage = url => {
   if (!inFlightPreviewRequests.has(url)) {
     const previewRequest = fetchPreviewHtml(url)
       .then(html => parsePreviewImage({ html, url }))
@@ -202,6 +193,24 @@ const getPreviewImage = async url => {
   }
 
   return inFlightPreviewRequests.get(url);
+};
+
+const getPreviewImage = async url => {
+  if (!url) {
+    return '';
+  }
+
+  const cachedEntry = getCachedPreviewEntry(url);
+
+  if (cachedEntry) {
+    if (!cachedEntry.isFresh) {
+      refreshPreviewImage(url);
+    }
+
+    return cachedEntry.imageUrl || '';
+  }
+
+  return refreshPreviewImage(url);
 };
 
 export const __resetPreviewCacheForTests = () => {

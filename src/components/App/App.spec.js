@@ -73,6 +73,7 @@ describe('App', () => {
     renderApp();
 
     expect(screen.getByTestId('initial-loader')).toBeInTheDocument();
+    expect(screen.getByText('Fetching top stories...')).toBeInTheDocument();
     expect(await screen.findByText('Story 1')).toBeInTheDocument();
     expect(screen.getByText('Story 2')).toBeInTheDocument();
   });
@@ -84,7 +85,7 @@ describe('App', () => {
       if (url.endsWith('/topstories.json')) {
         requestCount += 1;
 
-        if (requestCount === 1) {
+        if (requestCount < 3) {
           return Promise.resolve({ ok: false, status: 500 });
         }
 
@@ -141,13 +142,15 @@ describe('App', () => {
   });
 
   it('hydrates a fresh cached feed without fetching immediately', async () => {
+    const fetchedAt = Date.now();
+
     localStorage.setItem(
       FEED_CACHE_KEY,
       JSON.stringify({
         storyIds: [1],
         stories: [buildStory(1)],
         page: 1,
-        fetchedAt: Date.now(),
+        fetchedAt,
       }),
     );
 
@@ -161,14 +164,16 @@ describe('App', () => {
     });
   });
 
-  it('fetches from the network when the cached feed is expired', async () => {
+  it('shows stale cached content immediately and revalidates it from the network', async () => {
+    const fetchedAt = Date.now() - FEED_CACHE_TTL_MS - 1;
+
     localStorage.setItem(
       FEED_CACHE_KEY,
       JSON.stringify({
         storyIds: [1],
         stories: [buildStory(1)],
         page: 1,
-        fetchedAt: Date.now() - FEED_CACHE_TTL_MS - 1,
+        fetchedAt,
       }),
     );
 
@@ -182,6 +187,9 @@ describe('App', () => {
 
     renderApp(loadInitialState());
 
+    expect(screen.getByText('Story 1')).toBeInTheDocument();
+    expect(screen.getByRole('status')).toHaveTextContent('Cached feed from');
+    expect(screen.getByRole('button', { name: 'Refresh stories now' })).toBeInTheDocument();
     expect(await screen.findByText('Story 2')).toBeInTheDocument();
     expect(global.fetch).toHaveBeenCalledWith('https://hacker-news.firebaseio.com/v0/topstories.json');
   });

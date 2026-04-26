@@ -104,7 +104,7 @@ describe('linkPreviewApi', () => {
     expect(fetchSpy).not.toHaveBeenCalled();
   });
 
-  it('refetches when a persisted preview cache entry is older than one hour', async () => {
+  it('returns a stale cached preview immediately and refreshes it in the background', async () => {
     localStorage.setItem(
       '@@hackerNewsReader/storage/previewCache',
       JSON.stringify({
@@ -122,8 +122,16 @@ describe('linkPreviewApi', () => {
     });
 
     await expect(linkPreviewApi.getPreviewImage('https://example.com/article-8')).resolves.toBe(
-      'https://example.com/fresh.png',
+      'https://example.com/expired.png',
     );
+
+    await Promise.resolve();
+    await Promise.resolve();
+
     expect(fetchSpy).toHaveBeenCalledTimes(1);
+    expect(
+      JSON.parse(localStorage.getItem('@@hackerNewsReader/storage/previewCache'))['https://example.com/article-8']
+        .imageUrl,
+    ).toBe('https://example.com/fresh.png');
   });
 });

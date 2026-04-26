@@ -26,12 +26,14 @@ describe('story actions', () => {
       story: {
         storyIds: [1],
         stories: [buildStory(1)],
-        page: 1,
-        isFetching: false,
-        error: '',
-        pageError: '',
-      },
-    });
+      page: 1,
+      isFetching: false,
+      error: '',
+      pageError: '',
+      lastFetchedAt: Date.now(),
+      hasFreshCache: true,
+    },
+  });
 
     vi.spyOn(global, 'fetch').mockImplementation(url => {
       if (url.endsWith('/topstories.json')) {

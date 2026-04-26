@@ -45,12 +45,10 @@ export const loadFeedCache = ({ now = Date.now() } = {}) => {
     return null;
   }
 
-  if (!isFeedCacheFresh(cache, now)) {
-    saveState({ storageKey: FEED_CACHE_KEY, state: undefined });
-    return null;
-  }
-
-  return cache;
+  return {
+    ...cache,
+    isFresh: isFeedCacheFresh(cache, now),
+  };
 };
 
 export const saveFeedCache = ({ storyIds, stories, page, fetchedAt = Date.now() }) =>
