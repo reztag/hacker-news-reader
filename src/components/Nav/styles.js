@@ -1,7 +1,12 @@
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 import { tablet } from 'styles/mediaQueries';
 
 const HEIGHT = 64;
+
+const spin = keyframes`
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+`;
 
 export const Header = styled.header`
   background-color: ${({ theme }) => theme.backgroundSecondary};
@@ -45,6 +50,8 @@ export const NavSection = styled.div`
 export const CenterSection = styled.div`
   display: flex;
   justify-content: center;
+  align-items: center;
+  gap: 12px;
   min-width: 0;
 `;
 
@@ -106,17 +113,21 @@ export const ControlIcon = styled.span`
     width: 16px;
     height: 16px;
   }
+
+  svg.spinning {
+    animation: ${spin} 1s linear infinite;
+  }
 `;
 
 export const ControlLabel = styled.span`
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 500;
 `;
 
 export const StatusPill = styled.div`
-  min-height: 38px;
+  min-height: 42px;
   max-width: 100%;
-  padding: 0 14px;
+  padding: 0 16px;
   border-radius: 999px;
   border: 1px solid ${({ theme }) => theme.border};
   color: ${({ theme }) => theme.textSecondary};
@@ -138,26 +149,47 @@ export const StatusPill = styled.div`
 export const StatusText = styled.span`
   overflow: hidden;
   text-overflow: ellipsis;
-  font-size: 13px;
+  font-size: 15px;
 `;
 
 export const RefreshButton = styled.button`
-  border: 0;
-  border-radius: 999px;
-  min-width: 32px;
-  height: 32px;
-  padding: 0 10px;
-  cursor: pointer;
-  background: ${({ theme }) => theme.backgroundSecondary};
-  color: ${({ theme }) => theme.text};
-  font: inherit;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 1px solid ${({ theme }) => theme.border};
+  background: ${({ theme }) => theme.background};
+  color: ${({ theme }) => theme.text};
   flex-shrink: 0;
+  cursor: pointer;
+  transition:
+    background-color 120ms ease,
+    border-color 120ms ease,
+    transform 120ms ease;
+
+  &:hover:not(:disabled) {
+    background: ${({ theme }) => theme.backgroundSecondary};
+    border-color: ${({ theme }) => theme.textSecondary};
+    transform: translateY(-1px);
+  }
 
   &:disabled {
     cursor: wait;
     opacity: 0.7;
+
+    svg {
+      animation: ${spin} 1s linear infinite;
+    }
+  }
+
+  svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  svg.spinning {
+    animation: ${spin} 1s linear infinite;
   }
 `;

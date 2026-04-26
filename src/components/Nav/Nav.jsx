@@ -70,6 +70,19 @@ const InfoIcon = () => (
   </svg>
 );
 
+const RefreshIcon = ({ className }) => (
+  <svg viewBox="0 0 24 24" aria-hidden="true" className={className}>
+    <path
+      d="M4 4v5h.582m15.356 2A8.001 8.001 0 0 0 4.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 0 1-15.357-2m15.357 2H15"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+
 const Nav = ({
   layout,
   theme,
@@ -81,6 +94,17 @@ const Nav = ({
   isRefreshing = false,
 }) => {
   const elapsed = formatElapsedTime(lastFetchedAt);
+  const [isSpinning, setIsSpinning] = React.useState(false);
+
+  const handleRefresh = React.useCallback(() => {
+    if (!isSpinning) {
+      setIsSpinning(true);
+      setTimeout(() => setIsSpinning(false), 1000);
+    }
+    onRefresh();
+  }, [isSpinning, onRefresh]);
+
+  const spinningClass = isSpinning || isRefreshing ? 'spinning' : '';
 
   return (
     <div>
@@ -92,44 +116,30 @@ const Nav = ({
           <CenterSection>
             {showStaleStatus ? (
               <StatusPill role="status" aria-live="polite">
-                <StatusText>{`Cached feed from ${elapsed} ago`}</StatusText>
-                <RefreshButton type="button" onClick={onRefresh} disabled={isRefreshing} aria-label="Refresh stories now">
-                  {isRefreshing ? '...' : 'Refresh'}
-                </RefreshButton>
+                <span aria-hidden="true" style={{ fontSize: '15px', display: 'flex', alignItems: 'center' }}>{'\u26A0\uFE0F'}</span>
+                  <StatusText>{`Offline. Cached feed from ${elapsed} ago`}</StatusText>
               </StatusPill>
             ) : null}
           </CenterSection>
           <RightSection>
-          {layout === layouts.list ? (
-            <ControlButton type="button" aria-label="Switch to grid view" onClick={() => setLayout(layouts.grid)}>
-              <ControlIcon>
-                <GridIcon />
-              </ControlIcon>
-              <ControlLabel>Grid</ControlLabel>
-            </ControlButton>
-          ) : (
-            <ControlButton type="button" aria-label="Switch to list view" onClick={() => setLayout(layouts.list)}>
-              <ControlIcon>
-                <ListIcon />
-              </ControlIcon>
-              <ControlLabel>List</ControlLabel>
-            </ControlButton>
-          )}
-          {theme === themes.light ? (
-            <ControlButton type="button" aria-label="Switch to dark mode" onClick={() => setTheme(themes.dark)}>
-              <ControlIcon>
-                <MoonIcon />
-              </ControlIcon>
-              <ControlLabel>Dark</ControlLabel>
-            </ControlButton>
-          ) : (
-            <ControlButton type="button" aria-label="Switch to light mode" onClick={() => setTheme(themes.light)}>
-              <ControlIcon>
-                <SunIcon />
-              </ControlIcon>
-              <ControlLabel>Light</ControlLabel>
-            </ControlButton>
-          )}
+          <ControlButton type="button" aria-label="Refresh stories" onClick={handleRefresh}>
+            <ControlIcon>
+              <RefreshIcon className={spinningClass} />
+            </ControlIcon>
+            <ControlLabel>Refresh</ControlLabel>
+          </ControlButton>
+          <ControlButton type="button" aria-label={`Switch to ${layout === layouts.list ? 'grid' : 'list'} view`} onClick={() => setLayout(layout === layouts.list ? layouts.grid : layouts.list)}>
+            <ControlIcon>
+              {layout === layouts.list ? <ListIcon /> : <GridIcon />}
+            </ControlIcon>
+            <ControlLabel>{layout === layouts.list ? 'List' : 'Grid'}</ControlLabel>
+          </ControlButton>
+          <ControlButton type="button" aria-label={`Switch to ${theme === themes.light ? 'dark' : 'light'} mode`} onClick={() => setTheme(theme === themes.light ? themes.dark : themes.light)}>
+            <ControlIcon>
+              {theme === themes.light ? <SunIcon /> : <MoonIcon />}
+            </ControlIcon>
+            <ControlLabel>{theme === themes.light ? 'Light' : 'Dark'}</ControlLabel>
+          </ControlButton>
           <ControlButton type="button" aria-label="Open about dialog">
             <ControlIcon>
               <InfoIcon />

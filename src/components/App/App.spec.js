@@ -189,7 +189,7 @@ describe('App', () => {
 
     expect(screen.getByText('Story 1')).toBeInTheDocument();
     expect(screen.getByRole('status')).toHaveTextContent('Cached feed from');
-    expect(screen.getByRole('button', { name: 'Refresh stories now' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Refresh stories' })).toBeInTheDocument();
     expect(await screen.findByText('Story 2')).toBeInTheDocument();
     expect(global.fetch).toHaveBeenCalledWith('https://hacker-news.firebaseio.com/v0/topstories.json');
   });

@@ -16,6 +16,7 @@ import {
   Wrapper,
   StateCard,
   StateMessage,
+  StateSubMessage,
   RetryButton,
   InlineMessage,
   LoaderMessage,
@@ -99,7 +100,13 @@ const App = () => {
 
           {!hasStories && error ? (
             <StateCard role="alert">
-              <StateMessage>{error}</StateMessage>
+              <StateMessage>
+                <span aria-hidden="true" style={{ fontSize: '24px' }}>{'\u2757\u2757\u2757'}</span>
+                {error}
+              </StateMessage>
+              <StateSubMessage>
+                Please connect to the internet and click the button below to refresh.
+              </StateSubMessage>
               <RetryButton type="button" onClick={refreshStories}>
                 Retry loading stories
               </RetryButton>
@@ -108,14 +115,6 @@ const App = () => {
 
           {hasStories ? (
             <>
-              {pageError ? (
-                <StateCard role="status">
-                  <StateMessage>{pageError}</StateMessage>
-                  <RetryButton type="button" onClick={fetchStories}>
-                    Retry this page
-                  </RetryButton>
-                </StateCard>
-              ) : null}
               <InfiniteScroll
                 dataLength={stories.length}
                 next={fetchStories}
@@ -133,6 +132,17 @@ const App = () => {
               >
                 {layout === layouts.list ? <List stories={stories} /> : <Grid stories={stories} />}
               </InfiniteScroll>
+              {pageError ? (
+                <InlineMessage role="status">
+                  <StateMessage style={{ fontSize: '18px' }}>
+                    <span aria-hidden="true">{'\u2757'}</span>
+                    {pageError}
+                  </StateMessage>
+                  <RetryButton type="button" onClick={fetchStories} style={{ fontSize: '14px', padding: '8px 16px' }}>
+                    Retry this page
+                  </RetryButton>
+                </InlineMessage>
+              ) : null}
             </>
           ) : null}
         </Wrapper>
