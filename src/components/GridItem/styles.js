@@ -24,6 +24,19 @@ export const ExternalLink = styled.div`
   cursor: pointer;
 `;
 
+export const ImageLink = styled.a`
+  display: block;
+  text-decoration: none;
+`;
+
+export const TitleLink = styled.a`
+  text-decoration: none;
+  color: inherit;
+  &:hover {
+    text-decoration: underline;
+  }
+`;
+
 export const Image = styled.img`
   display: block;
   height: 240px;
@@ -71,7 +84,7 @@ export const Source = styled.div`
   font-size: 16px;
 `;
 
-export const CommentButton = styled.button`
+export const CommentButton = styled.a`
   background: none;
   border: 0;
   color: ${({ theme }) => theme.textSecondary};
@@ -82,6 +95,10 @@ export const CommentButton = styled.button`
   cursor: pointer;
   font: inherit;
   padding: 0;
+  text-decoration: none;
+  &:hover {
+    text-decoration: underline;
+  }
 `;
 
 export const CommentCount = styled.span`

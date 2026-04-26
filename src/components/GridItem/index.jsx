@@ -8,6 +8,8 @@ import {
   Item,
   Card,
   ExternalLink,
+  ImageLink,
+  TitleLink,
   Image,
   Content,
   Title,
@@ -37,6 +39,9 @@ const GridItem = ({ url, title, id, kids = [], descendants, useEmojiIcon = false
   const fallbackImageSrc = isXLink
     ? X_THUMBNAIL
     : FALLBACK_THUMBNAIL;
+  const openArticle = () => {
+    window.open(link, '_blank', 'noopener,noreferrer');
+  };
   const [imageSrc, setImageSrc] = useState(fallbackImageSrc);
 
   useEffect(() => {
@@ -62,29 +67,60 @@ const GridItem = ({ url, title, id, kids = [], descendants, useEmojiIcon = false
 
   return (
     <Item>
-      <ExternalLink>
+      <ExternalLink
+        role="link"
+        tabIndex={0}
+        aria-label={`Open ${title}`}
+        onClick={openArticle}
+        onKeyDown={event => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            openArticle();
+          }
+        }}
+      >
         <Card>
-          <Image
-            src={imageSrc}
-            alt={`${site} thumbnail`}
-            loading="lazy"
-            onError={() => {
-              if (imageSrc !== fallbackImageSrc) {
-                setImageSrc(fallbackImageSrc);
-              }
-            }}
-          />
+          <ImageLink 
+            href={link} 
+            tabIndex={-1} 
+            onClick={e => e.stopPropagation()} 
+            target="_blank" 
+            rel="noopener noreferrer"
+          >
+            <Image
+              src={imageSrc}
+              alt={`${site} thumbnail`}
+              loading="lazy"
+              onError={() => {
+                if (imageSrc !== fallbackImageSrc) {
+                  setImageSrc(fallbackImageSrc);
+                }
+              }}
+            />
+          </ImageLink>
           <Content>
-            <Title>{title}</Title>
+            <Title>
+              <TitleLink 
+                href={link} 
+                tabIndex={-1} 
+                onClick={e => e.stopPropagation()} 
+                target="_blank" 
+                rel="noopener noreferrer"
+              >
+                {title}
+              </TitleLink>
+            </Title>
             <Footer>
               <Source>{`// ${site}`}</Source>
               <CommentButton
-                type="button"
+                as="a"
+                href={commentUrl}
+                target="_blank"
+                rel="noopener noreferrer"
                 title="Open Hacker News comments"
                 aria-label="Open Hacker News comments"
                 onClick={event => {
                   event.stopPropagation();
-                  window.open(commentUrl, '_blank', 'noopener,noreferrer');
                 }}
               >
                 {useEmojiIcon ? (
