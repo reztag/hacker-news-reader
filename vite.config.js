@@ -22,6 +22,18 @@ export default defineConfig({
       utils: path.resolve(srcPath, 'utils'),
     },
   },
+  build: {
+    target: 'esnext',
+    minify: 'esbuild',
+    rollupOptions: {
+      output: {
+        manualChunks: undefined, // ensure single chunk for extension if preferred, or rely on vite default
+      },
+    },
+  },
+  esbuild: {
+    drop: ['console', 'debugger'],
+  },
   test: {
     environment: 'jsdom',
     setupFiles: './src/setupTests.js',

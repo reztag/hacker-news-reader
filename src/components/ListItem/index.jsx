@@ -1,12 +1,12 @@
-import React from 'react';
+import React, { memo } from 'react';
 import PropTypes from 'prop-types';
-import TimeAgo from 'react-timeago';
 import getSiteHostname from 'utils/getSiteHostname';
 import getArticleLink, { HN_USER, HN_ITEM } from 'utils/getArticleLink';
+import formatElapsedTime from 'utils/formatElapsedTime';
 
 import { Item, Title, Host, ExternalLink, Description, CommentLink } from './styles';
 
-const ListItem = ({ by, kids = [], score, url, title, id, type, time }) => {
+const ListItem = memo(({ by, kids = [], score, url, title, id, type, time }) => {
   const site = getSiteHostname(url) || 'news.ycombinator.com';
   const link = getArticleLink({ url, id });
   const commentUrl = `${HN_ITEM}${id}`;
@@ -23,14 +23,16 @@ const ListItem = ({ by, kids = [], score, url, title, id, type, time }) => {
         <CommentLink href={`${HN_USER}${by}`} rel="nofollow noreferrer noopener" target="_blank">
           {by}
         </CommentLink>{' '}
-        <TimeAgo date={new Date(time * 1000).toISOString()} />{' | '}
+        <time dateTime={new Date(time * 1000).toISOString()}>{formatElapsedTime(time * 1000)} ago</time>{' | '}
         <CommentLink href={commentUrl} rel="nofollow noreferrer noopener" target="_blank">
           {kids.length} Comments
         </CommentLink>
       </Description>
     </Item>
   );
-};
+});
+
+ListItem.displayName = 'ListItem';
 
 ListItem.propTypes = {
   by: PropTypes.string.isRequired,

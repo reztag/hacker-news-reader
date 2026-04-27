@@ -23,10 +23,6 @@ vi.mock('react-infinite-scroll-component', () => ({
   ),
 }));
 
-vi.mock('react-timeago', () => ({
-  default: ({ date }) => React.createElement('time', null, String(date)),
-}));
-
 const renderApp = (initialState = {}) => {
   const store = configureStore(initialState);
   return render(

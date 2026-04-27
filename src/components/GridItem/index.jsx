@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, memo } from 'react';
 import PropTypes from 'prop-types';
 import getSiteHostname from 'utils/getSiteHostname';
 import getArticleLink, { HN_ITEM } from 'utils/getArticleLink';
@@ -30,7 +30,7 @@ const isXPreviewHostname = hostname =>
   hostname.endsWith('.x.com') ||
   hostname.endsWith('.twitter.com');
 
-const GridItem = ({ url, title, id, kids = [], descendants, useEmojiIcon = false }) => {
+const GridItem = memo(({ url, title, id, kids = [], descendants, useEmojiIcon = false }) => {
   const site = getSiteHostname(url) || 'news.ycombinator.com';
   const link = getArticleLink({ url, id });
   const commentUrl = `${HN_ITEM}${id}`;
@@ -145,7 +145,9 @@ const GridItem = ({ url, title, id, kids = [], descendants, useEmojiIcon = false
       </ExternalLink>
     </Item>
   );
-};
+});
+
+GridItem.displayName = 'GridItem';
 
 GridItem.propTypes = {
   url: PropTypes.string,
